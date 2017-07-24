@@ -1,30 +1,28 @@
-
-from collections import deque
+from math import log
+from heapq import heappop, heappush
 
 mod = 1000000007
 
 def minArray(a, n, k):
-    end = deque()
-    end.append(0)
-    for x in range(1, n):
+    s = [x for x in a]
+    q = []
+    heappush(q, (log(s[0]), 0))
+    
+    for i in range(1, n):
         
-        while end[0] < x - k: #This function accumulates a list of k elements
-            end.popleft() #removes the oldest elements
+        v, ind = heappop(q)
+        
+        while k < i - ind: #This function accumulates a list of k elements
+            v, ind = heappop(q)
             
-        a[x] *= a[end[0]] #Rewrites a[x] into the optimized product
+        s[i] = (s[ind]*a[i]) % mod#Rewrites s[i] into the optimized product
         
-        while end and a[end[-1]] >= a[x]:
-            #If end is not empty and its last element is >= to a[x]
-            end.pop()
-        end.append(x)
+        heappush(q, (v, ind))
+        heappush(q, (v+log(a[i]), i))
         
-    print(a[-1]%mod)
-    
-def parse(val):
-    return [int(value) for value in val.split(' ')]
+    return s[-1]
 
-if __name__ == "__main__":
-    
-    N, K = parse(input())
-    A = parse(input())
-    minArray(A, N, K)
+N, K = map(int, input().split(' '))
+A = list(map(int, input().split(' ')))
+print(minArray(A, N, K))
+
